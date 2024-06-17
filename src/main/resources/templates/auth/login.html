@@ -5,6 +5,68 @@
     <title>카카오, 네이버, 구글 로그인 화면 구현</title>
 </head>
 <body>
-gfdgdg
+<ul>
+    <li onclick="kakaoLogin();">
+        <a href="javascript:void(0)">
+            <span>카카오 로그인</span>
+        </a>
+    </li>
+    <li onclick="kakaoLogout();">
+        <a href="javascript:void(0)">
+            <span>카카오 로그아웃</span>
+        </a>
+    </li>
+</ul>
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script>
+    Kakao.init('7a7a9e17f9a403977b4c94762c649cae');
+    function kakaoLogin() {
+        Kakao.Auth.login({
+          success: function (response) {
+            Kakao.API.request({
+              url: '/v2/user/me',
+              success: function (response) {
+                  $.ajax({
+                    url: '/auth/setToken',
+                    type: "GET",
+                    data : {name : response.properties.nickname},
+                    success : function(data){
+                      location.href = '/auth/success';
+                    },
+                    error : function(){
+                      alert("에러")
+                    }
+                  });
+              },
+              fail: function (error) {
+                alert("로그인에 실패하였습니다.");
+              },
+            })
+          },
+          fail: function (error) {
+            console.log(error)
+          },
+        })
+      }
+
+    function kakaoLogout() {
+    if (Kakao.Auth.getAccessToken()) {
+      Kakao.API.request({
+        url: '/v1/user/unlink',
+        success: function (response) {
+
+        },
+        fail: function (error) {
+          console.log(error)
+        },
+      })
+      Kakao.Auth.setAccessToken(undefined)
+    }
+  }
+
+</script>
+
 </body>
 </html>
